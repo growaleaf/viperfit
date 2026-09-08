@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ViperFit — Check Your HOTAS Covers Falcon BMS's Core Switchology</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+  <h1>Check Your HOTAS Covers Falcon BMS's Core Switchology</h1>
+  <p class="tagline">Pick the controller you own (or are about to buy) and how far into BMS's switchology you fly. See how many of that tier's core functions land on your stick, and which categories you'll push to keyboard.</p>
+</header>
+
+<main>
+  <section class="picker">
+    <div class="picker-field">
+      <label for="controller-select">Controller</label>
+      <select id="controller-select"></select>
+    </div>
+    <div class="picker-field">
+      <label for="tier-select">Control Tier</label>
+      <select id="tier-select"></select>
+    </div>
+  </section>
+
+  <section class="result">
+    <h2 id="result-heading"></h2>
+    <div class="result-meta">
+      <div><span class="meta-label">Controller has:</span> <span id="controller-slots"></span></div>
+      <div><span class="meta-label">Tier needs:</span> <span id="tier-needs"></span></div>
+    </div>
+    <p id="fit-summary" class="fit-summary"></p>
+
+    <table class="category-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Functions needed</th>
+          <th>Slots covered</th>
+          <th>Left over</th>
+        </tr>
+      </thead>
+      <tbody id="category-rows"></tbody>
+    </table>
+
+    <div id="shortfall-notes" class="shortfall-notes"></div>
+
+    <div class="source-block">
+      <div class="source-line" id="controller-sources"></div>
+      <div class="source-line" id="tier-sources"></div>
+    </div>
+  </section>
+
+  <section class="about">
+    <h2>What this counts</h2>
+    <p>"Core functions" are hand-counted from a dated primary source per tier — not the game's full bindable-key list. Minimum Viable is sourced from a community "bare minimum" keybind gist, narrowed to just flight and weapons-release (its other listed items are switchology, which this tier is defined to exclude). Standard Combat is sourced from the official BMS Technical Manual's own worked HOTAS config example: the TMS, DMS and CMS hat functions plus the missile-step and pinky-switch radar/mode functions. "Slots" means physical buttons, axes, and hats on the controller, counted from the manufacturer's own product page. One physical input covers one function.</p>
+    <p>This tool reports counts. It does not tell you a controller is required, sufficient, or the best choice for BMS — that judgment is yours.</p>
+  </section>
+
+  <section class="about">
+    <h2>Controllers and tiers covered</h2>
+    <p>Controllers: Thrustmaster T.16000M FCS, T.16000M FCS HOTAS, T-Flight HOTAS 4, T.Flight HOTAS X.</p>
+    <p>Control tiers: Minimum Viable (basic flight + weapons release), Standard Combat (adds TMS/DMS/CMS and radar/master-mode step functions). A third tier, Full Switchology (ICP/DED data entry, IFF, ECM, TQS throttle switches), is not included in this build — the official manual presents those functions as cockpit diagrams rather than an enumerable list, and a defensible count could not be sourced within this session's research budget rather than guess at one.</p>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <p>Built for forum.falcon-bms.com and r/hoggit. Every number links to the source it came from. Found a mistake, or want another controller or the Full Switchology tier added? Post in the thread — this list grows from what pilots actually fly.</p>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
