@@ -55,10 +55,34 @@ const CONTROLLERS = [
     sources: [
       { label: "Thrustmaster — T.Flight HOTAS X product page (via Wayback Machine, captured 2023-02-09; thrustmaster.com is under maintenance as of 2026-09-08): \"12 programmable action buttons\", \"5 axes\"", url: "https://web.archive.org/web/20230209055449/https://www.thrustmaster.com/en-us/products/t-flight-hotas-x-3/" }
     ]
+  },
+  {
+    id: "logitech-x56",
+    name: "Logitech G X56 H.O.T.A.S.",
+    note: "joystick + throttle, includes thumb mini-sticks",
+    buttons: 31,
+    axes: 13,
+    hats: 5,
+    tier: "pro",
+    sources: [
+      { label: "Logitech G — X56 H.O.T.A.S. product page (logitechg.com, captured 2026-10-02): \"189+ PROGRAMMABLE CONTROLS — Customize all 13 axes, 5 HATS, and 31 programmable buttons over three modes.\"", url: "https://www.logitechg.com/en-us/shop/p/x56-space-flight-vr-simulator-controller" }
+    ]
+  },
+  {
+    id: "twcs-throttle",
+    name: "Thrustmaster TWCS Throttle",
+    note: "throttle only, no joystick",
+    buttons: 14,
+    axes: 5,
+    hats: 1,
+    tier: "pro",
+    sources: [
+      { label: "Thrustmaster — TWCS Throttle product page (thrustmaster.com, captured 2026-10-02): \"ERGONOMY — Including 5 axes and 14 action buttons\"; body text: \"the TWCS throttle includes 14 buttons and one 8-way-PoV hat switch\"", url: "https://www.thrustmaster.com/en-us/products/twcs-throttle/" }
+    ]
   }
 ];
 
-const CATEGORY_PRIORITY = ["Flight/Basic", "Weapons Release", "TMS/DMS/CMS", "Radar/Master Mode"];
+const CATEGORY_PRIORITY = ["Flight/Basic", "Weapons Release", "TMS/DMS/CMS", "Radar/Master Mode", "Trim", "Views", "System Overrides"];
 
 const GIST_SOURCE = {
   label: "GitHub gist (arithex) — \"Absolute Bare Minimum Key Bindings\" for Falcon BMS, community-sourced, not an official document, captured 2026-09-08. Only the Taxi/Takeoff/Fly/Land and Guns/Weapons-release entries are used here — the tier definition below excludes this gist's other listed functions (radar cursor, uncage, countermeasures, jammer, display switching) because those are the switchology this tier is defined to NOT include.",
@@ -67,6 +91,16 @@ const GIST_SOURCE = {
 
 const BMS_MANUAL_SOURCE = {
   label: "Falcon BMS Technical Manual (Benchmark Sims, Change 1.00), Section 2 \"The HOTAS issue\", p.2-19 — worked keyfile example listing SimTMSUp/Left/Right/Down, SimDMSUp/Left/Right/Down, SimCMSUp/Left/Right/Down, SimMissileStep, SimPinkySwitch verbatim, captured 2026-09-08",
+  url: "https://cdn.falcon-bms.com/docs/4.35/bms-technical-manual.pdf"
+};
+
+const BMS_MANUAL_FULL_SOURCE = {
+  label: "Falcon BMS Technical Manual (Benchmark Sims, Change 1.00), Section 2 \"The HOTAS issue\", p.2-19 — the SAME worked keyfile example as Standard Combat, read in full: it also lists SimPinkySwitch and SimAPOverride, which Standard Combat deliberately excludes. Verbatim from the PDF: \"SimPinkySwitch = v\" and \"SimAPOverride = ALT q\", captured 2026-10-02",
+  url: "https://cdn.falcon-bms.com/docs/4.35/bms-technical-manual.pdf"
+};
+
+const BMS_TRIM_VIEW_SOURCE = {
+  label: "Falcon BMS Technical Manual (Benchmark Sims, Change 1.00), Section 10.9.2 \"How to change the DX POV functions (Trim vs. View & other functions)\", p.10-107 — lists the default HOTAS-unshifted trim callbacks (AFElevatorTrimUp, AFAileronTrimRight, AFElevatorTrimDown, AFAileronTrimLeft) and the HOTAS-shifted view callbacks (OTWViewUp, OTWViewRight, OTWViewDown, OTWViewLeft) verbatim, captured 2026-10-02",
   url: "https://cdn.falcon-bms.com/docs/4.35/bms-technical-manual.pdf"
 };
 
@@ -96,5 +130,34 @@ const TIERS = [
     total_functions: 20,
     source_url: BMS_MANUAL_SOURCE.url,
     source_note: BMS_MANUAL_SOURCE.label
+  },
+  {
+    id: "trim-and-view",
+    tier_name: "Trim & View Control",
+    tier_note: "The default HOTAS trim axis functions (elevator/aileron trim) plus the shifted-layer out-the-window view functions from BMS's own default key file.",
+    core_functions: [
+      { category: "Trim", count: 4 },
+      { category: "Views", count: 4 }
+    ],
+    total_functions: 8,
+    tier: "pro",
+    source_url: BMS_TRIM_VIEW_SOURCE.url,
+    source_note: BMS_TRIM_VIEW_SOURCE.label
+  },
+  {
+    id: "full-switch-program",
+    tier_name: "Full Switch Program",
+    tier_note: "Everything in Standard Combat plus the pinky switch and autopilot override — the complete worked HOTAS keyfile example from the Technical Manual, nothing left out.",
+    core_functions: [
+      { category: "Flight/Basic", count: 5 },
+      { category: "Weapons Release", count: 1 },
+      { category: "TMS/DMS/CMS", count: 12 },
+      { category: "Radar/Master Mode", count: 2 },
+      { category: "System Overrides", count: 2 }
+    ],
+    total_functions: 22,
+    tier: "pro",
+    source_url: BMS_MANUAL_FULL_SOURCE.url,
+    source_note: BMS_MANUAL_FULL_SOURCE.label
   }
 ];

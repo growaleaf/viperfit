@@ -1,3 +1,6 @@
+// Set after the Stripe payment link is created (see STRIPE.md).
+const PRO_PAYMENT_LINK_URL = "https://buy.stripe.com/6oU7sN66k9mh6Vmb5hfrW33";
+
 function computeFit(controller, tier) {
   const totalSlots = controller.buttons + controller.axes + controller.hats;
   let remaining = totalSlots;
@@ -93,6 +96,7 @@ function renderResult(controller, tier) {
 }
 
 function populateSelect(select, items, nameKey) {
+  select.innerHTML = "";
   items.forEach(function (item) {
     const opt = document.createElement("option");
     opt.value = item.id;
@@ -101,17 +105,96 @@ function populateSelect(select, items, nameKey) {
   });
 }
 
+function isPro(item) {
+  return item.tier === "pro";
+}
+
+function updateUnlockUI(unlocked) {
+  const unlockSection = document.getElementById("unlock-section");
+  const proControllers = CONTROLLERS.filter(isPro).length;
+  const proTiers = TIERS.filter(isPro).length;
+
+  if (unlocked) {
+    unlockSection.innerHTML = "";
+    const p = el("p", "unlock-status", "Pro unlocked — all controllers and control tiers available.");
+    unlockSection.appendChild(p);
+    return;
+  }
+
+  unlockSection.innerHTML = "";
+  const buyP = document.createElement("p");
+  const buyLink = el("a", "btn-buy", "Unlock all " + (CONTROLLERS.length) + " controllers / " + (TIERS.length) + " control tiers — $9 one time");
+  buyLink.href = PRO_PAYMENT_LINK_URL;
+  buyLink.target = "_blank";
+  buyLink.rel = "noopener noreferrer";
+  buyP.appendChild(buyLink);
+  buyP.appendChild(document.createTextNode(" (adds " + proControllers + " more controllers, " + proTiers + " more control tiers)"));
+  unlockSection.appendChild(buyP);
+
+  const form = document.createElement("form");
+  form.className = "license-form";
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "Already purchased? Paste your license key";
+  input.id = "license-input";
+  const submit = document.createElement("button");
+  submit.type = "submit";
+  submit.textContent = "Activate";
+  const msg = el("span", "license-msg", "");
+  form.appendChild(input);
+  form.appendChild(submit);
+  form.appendChild(msg);
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    verifyLicense(input.value).then(function (res) {
+      if (res.ok) {
+        storeLicense(input.value);
+        refreshTierAndRender();
+      } else {
+        msg.textContent = res.reason;
+        msg.className = "license-msg license-error";
+      }
+    });
+  });
+  unlockSection.appendChild(form);
+}
+
+let unlockedState = false;
+
+function visibleControllers() {
+  return unlockedState ? CONTROLLERS : CONTROLLERS.filter(function (c) { return !isPro(c); });
+}
+function visibleTiers() {
+  return unlockedState ? TIERS : TIERS.filter(function (t) { return !isPro(t); });
+}
+
+function refreshTierAndRender() {
+  loadStoredLicense().then(function (license) {
+    unlockedState = !!license;
+    updateUnlockUI(unlockedState);
+
+    const controllerSelect = document.getElementById("controller-select");
+    const tierSelect = document.getElementById("tier-select");
+    const prevController = controllerSelect.value;
+    const prevTier = tierSelect.value;
+
+    populateSelect(controllerSelect, visibleControllers(), "name");
+    populateSelect(tierSelect, visibleTiers(), "tier_name");
+
+    controllerSelect.value = visibleControllers().some(function (c) { return c.id === prevController; })
+      ? prevController : "t16000m-fcs-hotas";
+    tierSelect.value = visibleTiers().some(function (t) { return t.id === prevTier; })
+      ? prevTier : "standard-combat";
+
+    const controller = CONTROLLERS.find(function (c) { return c.id === controllerSelect.value; });
+    const tier = TIERS.find(function (t) { return t.id === tierSelect.value; });
+    renderResult(controller, tier);
+  });
+}
+
 function init() {
   const controllerSelect = document.getElementById("controller-select");
   const tierSelect = document.getElementById("tier-select");
-
-  populateSelect(controllerSelect, CONTROLLERS, "name");
-  populateSelect(tierSelect, TIERS, "tier_name");
-
-  const defaultControllerId = "t16000m-fcs-hotas";
-  const defaultTierId = "standard-combat";
-  controllerSelect.value = defaultControllerId;
-  tierSelect.value = defaultTierId;
 
   function update() {
     const controller = CONTROLLERS.find(function (c) { return c.id === controllerSelect.value; });
@@ -122,7 +205,7 @@ function init() {
   controllerSelect.addEventListener("change", update);
   tierSelect.addEventListener("change", update);
 
-  update();
+  refreshTierAndRender();
 }
 
 document.addEventListener("DOMContentLoaded", init);
